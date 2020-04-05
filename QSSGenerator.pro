@@ -28,16 +28,12 @@ SOURCES += \
         main.cpp \
         widget.cpp \
     buttons.cpp \
-    pushbutton.cpp \
-    sliderwidthvalueshow.cpp \
-    getcolor.cpp
+    pushbutton.cpp
 
 HEADERS += \
         widget.h \
     buttons.h \
-    pushbutton.h \
-    sliderwidthvalueshow.h \
-    getcolor.h
+    pushbutton.h
 
 FORMS += \
         widget.ui

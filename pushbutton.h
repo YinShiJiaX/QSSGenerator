@@ -1,9 +1,6 @@
 #ifndef PUSHBUTTON_H
 #define PUSHBUTTON_H
 
-#include "getcolor.h"
-#include "sliderwidthvalueshow.h"
-
 #include <QWidget>
 #include <QScrollArea>
 #include <QLabel>
@@ -13,26 +10,185 @@
 #include <QComboBox>
 #include <QGraphicsDropShadowEffect>
 #include <QPushButton>
+#include <QColorDialog>
 #include <QSlider>
-class QPushButton;
-class QGroupBox;
-class QHBoxLayout;
-class QSpinBox;
+#include <QDebug>
+#include <QVBoxLayout>
+#include <QColor>
+
+class QColorDialog;
 class GetColor;
+class QLineEdit;
+class QGroupBox;
+class QSpinBox;
 class SliderWidthValueShow;
 class QFontComboBox;
-class PushBtnStyleTab;
-class QVBoxLayout;
+class PushBtnStyleTabWidget;
 class NormalStyleArea;
-class NormalStyleWidget;
+class NormalStyleTabPage;
 class QFont;
 class ItalicAndBoldWidget;
 class ShadowEffectWidget;
 class AlignAndDecorationWidget;
+class HoverStyleTabPage;
+class HoverStyleArea;
+class PressedStyleTabPage;
+class PressedStyleArea;
+class CheckedStyleTabPage;
+class CheckedStyleArea;
+class MyPushButton;
 #define WMIN 0
 #define WMAX 200
 #define HMIN 0
 #define HMAX 100
+
+//pushButton 样式生成总页面
+class PushButtonTabPage : public QWidget
+{
+    Q_OBJECT
+public:
+    PushButtonTabPage(QWidget *parent = nullptr);
+
+    QString normalString;
+    QString hoverString;
+    QString pressedString;
+    QString checkedString;
+public slots:
+
+private:
+    MyPushButton *pushBtn;
+    QLineEdit *lineEdit;
+    NormalStyleTabPage *normalWidget;
+    NormalStyleArea *normalArea;
+    PushBtnStyleTabWidget *styleTab;
+
+};
+
+class GetColor : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit GetColor(const QString str, QWidget *parent = nullptr) : QWidget(parent)
+    {
+        pushBtn = new QPushButton;
+        colorDialog = new QColorDialog;
+        colorDialog->setOption(QColorDialog::ShowAlphaChannel);
+        pushBtn->setText(str);
+
+        QGridLayout *gLayout = new QGridLayout;
+        gLayout->addWidget(pushBtn);
+
+        setLayout(gLayout);
+
+        connect(pushBtn, &QPushButton::clicked, colorDialog, &QColorDialog::show);
+        connect(colorDialog, &QColorDialog::currentColorChanged, this, &GetColor::causeColorChanged);
+    }
+
+private slots:
+    void causeColorChanged(const QColor &color)
+    {
+        int r, g, b, a;
+        color.getRgb(&r, &g, &b, &a);
+        QString str;
+        str = "(" + QString::number(r) + ", " + QString::number(g) +
+            + ", " + QString::number(b) + ", " + QString::number(a) + ");";
+
+        emit colorChanged(str);
+    }
+
+signals:
+    void colorChanged(QString colorStr);
+
+private:
+    QPushButton *pushBtn;
+    QColorDialog *colorDialog;
+};
+
+
+//带数值显示的滑块
+class SliderWidthValueShow : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit SliderWidthValueShow(const QString str,  int min, int max, QWidget *parent = nullptr) : QWidget(parent)
+    {
+        indicateStr = str + ":";
+        label = new QLabel;
+        label->setText(str);
+        slider = new QSlider;
+        slider->setOrientation(Qt::Horizontal);
+        slider->setRange(min, max);
+
+        QVBoxLayout *vlayout = new QVBoxLayout;
+        vlayout->addWidget(label);
+        vlayout->addWidget(slider);
+
+        setLayout(vlayout);
+
+        connect(slider , &QSlider::valueChanged, this, &SliderWidthValueShow::causeChangeValue);
+
+    }
+    void setValue(int value)
+    {
+        slider->setValue(value);
+    }
+
+
+signals:
+    void valueChanged(QString str);
+
+public slots:
+    void causeChangeValue(int value)
+    {
+        QString str;
+        str = QString::number(value) + "px;";
+        label->setText(indicateStr + str);
+        emit valueChanged(str);
+    }
+
+private:
+    QLabel *label;
+    QSlider *slider;
+    QString indicateStr;
+    QString valueStr;
+};
+
+//pushButton 样式控制面板
+class PushBtnStyleTabWidget : public QTabWidget
+{
+    Q_OBJECT
+
+public:
+    PushBtnStyleTabWidget(QWidget *parent = nullptr);
+
+public slots:
+    void changeNormalStyleStr(QString str);
+    void changeHoverStyleStr(QString str);
+    void changePressedStyleStr(QString str);
+    void changeCheckedStyleStr(QString str);
+private:
+    void changeStyleStr();
+signals:
+    void styleChanged(QString styleStr);
+
+private:
+    QString normalStyleStr;
+    QString pressedStyleStr;
+    QString checkedStyleStr;
+    QString hoverStyleStr;
+    QString styleStr;
+
+    NormalStyleTabPage *normalTabPage;
+    NormalStyleArea *normalScrollArea;
+    HoverStyleTabPage *hoverTabPage;
+    HoverStyleArea *hoverScrollArea;
+    PressedStyleArea *pressedScrollArea;
+    PressedStyleTabPage *pressedTabPage;
+    CheckedStyleTabPage *checkedTabPage;
+    CheckedStyleArea *checkedStyleArea;
+
+};
+
 
 //自定义带阴影样式按钮
 class MyPushButton : public QPushButton
@@ -42,7 +198,9 @@ public:
     MyPushButton(QString str, QWidget *parent = nullptr) : QPushButton(str, parent)
     {
         shadowEffect = new QGraphicsDropShadowEffect;
+        btn = new QPushButton;
         setGraphicsEffect(shadowEffect);
+        setCheckable(true);
     }
 
     void setQSS(QString str)
@@ -66,13 +224,13 @@ public:
     }
 private:
     QGraphicsDropShadowEffect *shadowEffect;
+    QPushButton *btn;//该控件用于保存shadowEffect效果，除此之外别无用处
     void drawShadowEffect(qreal dx, qreal dy, qreal blurRadius, QColor color)
     {
         shadowEffect->setOffset(dx, dy);
         shadowEffect->setBlurRadius(blurRadius);
         shadowEffect->setColor(color);
     }
-
 };
 
 class ShadowEffectWidget : public QWidget
@@ -149,27 +307,6 @@ private:
         styleStr = xStr + yStr + blurStr + colorStr;
         emit styleChanged(styleStr);
     }
-};
-
-//pushButton 样式生成总页面
-class PushButtonPage : public QWidget
-{
-    Q_OBJECT
-public:
-    PushButtonPage(QWidget *parent = nullptr);
-
-    QString normalString;
-    QString hoverString;
-    QString pressedString;
-    QString checkedString;
-public slots:
-
-private:
-    MyPushButton *pushBtn;
-    NormalStyleWidget *normalWidget;
-    NormalStyleArea *normalArea;
-    PushBtnStyleTab *styleTab;
-
 };
 
 class AlignAndDecorationWidget : public QWidget
@@ -265,32 +402,6 @@ signals:
 
 };
 
-//pushButton 样式控制面板
-class PushBtnStyleTab : public QTabWidget
-{
-    Q_OBJECT
-
-public:
-    PushBtnStyleTab(QWidget *parent = nullptr);
-
-public slots:
-    void changeNormalStyleStr(QString str);
-private:
-    void changeStyleStr();
-signals:
-    void styleChanged(QString styleStr);
-
-private:
-    QString normalStyleStr;
-    QString pressedStyleStr;
-    QString checkedStyleStr;
-    QString hoverStyleStr;
-    QString styleStr;
-
-    NormalStyleWidget *normalWidget;
-    NormalStyleArea *normalArea;
-};
-
 //pushButton Normal样式设定浏览区域
 class NormalStyleArea : public QScrollArea
 {
@@ -302,14 +413,146 @@ public:
     }
 };
 
+//pushButton Hover样式设定浏览区域
+class HoverStyleArea : public QScrollArea
+{
+    Q_OBJECT
+public:
+    HoverStyleArea(QWidget *parent = nullptr) : QScrollArea (parent)
+    {
+
+    }
+};
+
+//pushButton Hover样式设定浏览区域
+class CheckedStyleArea : public QScrollArea
+{
+    Q_OBJECT
+public:
+    CheckedStyleArea(QWidget *parent = nullptr) : QScrollArea (parent)
+    {
+
+    }
+};
+
+class PressedStyleArea : public QScrollArea
+{
+    Q_OBJECT
+public:
+    PressedStyleArea(QWidget *parent = nullptr) : QScrollArea (parent)
+    {
+
+    }
+};
+
+//pushButton Hover样式设定面板
+class HoverStyleTabPage : public QWidget
+{
+    Q_OBJECT
+public:
+    HoverStyleTabPage(QWidget *parent = nullptr);
+    QVBoxLayout *initPanel();
+
+private:
+    GetColor *borderColor;
+    GetColor *backGroundColor;
+    GetColor *fontColor;
+    SliderWidthValueShow *radiusSize;
+    SliderWidthValueShow *borderSize;
+
+    QString borderSizeStr = "border-width: 0px;";
+    QString radiusSizeStr = "border-radius: 0px;";
+    QString fontColorStr = "color: black;";
+    QString backGroundColorStr = "background-color: gray;";
+    QString borderColorStr = "border-color: red;";
+
+private slots:
+    void borderColorChange(QString str);
+    void backGroundColorChange(QString str);
+    void fontColorChange(QString str);
+    void borderSizeChange(QString str);
+    void radiusSizeChange(QString str);
+
+    void upDateHoverStyle();
+signals:
+    void hoverStyleChanged(QString str);
+
+};
+
+//pushButton Hover样式设定面板
+class CheckedStyleTabPage : public QWidget
+{
+    Q_OBJECT
+public:
+    CheckedStyleTabPage(QWidget *parent = nullptr);
+    QVBoxLayout *initPanel();
+
+private:
+    GetColor *borderColor;
+    GetColor *backGroundColor;
+    GetColor *fontColor;
+    SliderWidthValueShow *radiusSize;
+    SliderWidthValueShow *borderSize;
+
+    QString borderSizeStr = "border-width: 0px;";
+    QString radiusSizeStr = "border-radius: 0px;";
+    QString fontColorStr = "color: black;";
+    QString backGroundColorStr = "background-color: gray;";
+    QString borderColorStr = "border-color: red;";
+
+private slots:
+    void borderColorChange(QString str);
+    void backGroundColorChange(QString str);
+    void fontColorChange(QString str);
+    void borderSizeChange(QString str);
+    void radiusSizeChange(QString str);
+
+    void upDateCheckedStyle();
+signals:
+    void checkedStyleChanged(QString str);
+};
+
+//pushButton pressed样式设定面板
+class PressedStyleTabPage : public QWidget
+{
+    Q_OBJECT
+public:
+    PressedStyleTabPage(QWidget *parent = nullptr);
+    QVBoxLayout *initPanel();
+
+private:
+    GetColor *borderColor;
+    GetColor *backGroundColor;
+    GetColor *fontColor;
+    SliderWidthValueShow *radiusSize;
+    SliderWidthValueShow *borderSize;
+
+    QString borderSizeStr = "border-width: 0px;";
+    QString radiusSizeStr = "border-radius: 0px;";
+    QString fontColorStr = "color: black;";
+    QString backGroundColorStr = "background-color: gray;";
+    QString borderColorStr = "border-color: red;";
+
+private slots:
+    void borderColorChange(QString str);
+    void backGroundColorChange(QString str);
+    void fontColorChange(QString str);
+    void borderSizeChange(QString str);
+    void radiusSizeChange(QString str);
+
+    void upDatePressedStyle();
+signals:
+    void pressedStyleChanged(QString str);
+
+};
 
 //pushButton Normal样式设定面板
-class NormalStyleWidget : public QWidget
+class NormalStyleTabPage : public QWidget
 {
     Q_OBJECT
 
 public:
-    NormalStyleWidget(QWidget *parent = nullptr);
+    NormalStyleTabPage(QWidget *parent = nullptr);
     QVBoxLayout *initPanel();
 
 private:
@@ -355,5 +598,6 @@ public slots:
 signals:
     void normalStyleChanged(QString str);
 };
+
 
 #endif // PUSHBUTTON_H

@@ -2,10 +2,10 @@
 #define BUTTONS_H
 
 #include <QTabWidget>
-class ButtonsTab : public QTabWidget
+class ButtonsTabWidget : public QTabWidget
 {
 public:
-    ButtonsTab(QWidget *parent = nullptr);
+    ButtonsTabWidget(QWidget *parent = nullptr);
 };
 
 #endif // BUTTONS_H

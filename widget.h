@@ -6,7 +6,7 @@
 class QStackedWidget;
 class QListWidget;
 class QTabWidget;
-class ButtonsTab;
+class ButtonsTabWidget;
 
 namespace Ui {
 class Widget;
@@ -29,7 +29,7 @@ private:
     QStringList widgetsTypeNameList = {"Buttons",
                                        "Containers"};
 
-    ButtonsTab *buttonsTab;
+    ButtonsTabWidget *buttonsTabWidget;
 
 };
 

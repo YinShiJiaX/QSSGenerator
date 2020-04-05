@@ -3,9 +3,9 @@
 
 #include <QTabWidget>
 
-ButtonsTab::ButtonsTab(QWidget *parent) : QTabWidget (parent)
+ButtonsTabWidget::ButtonsTabWidget(QWidget *parent) : QTabWidget (parent)
 {
     setTabShape(QTabWidget::Triangular);
-    PushButtonPage *pushBtnPage = new PushButtonPage;
-    addTab(pushBtnPage, "PushButton");
+    PushButtonTabPage *pushBtnTabPage = new PushButtonTabPage;
+    addTab(pushBtnTabPage, "PushButton");
 }

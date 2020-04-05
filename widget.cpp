@@ -35,8 +35,8 @@ Widget::Widget(QWidget *parent) :
 
 void Widget::initStackedWidget()
 {
-    buttonsTab = new ButtonsTab;
-    stackedWidget->addWidget(buttonsTab);
+    buttonsTabWidget = new ButtonsTabWidget;
+    stackedWidget->addWidget(buttonsTabWidget);
 }
 
 Widget::~Widget()

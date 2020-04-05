@@ -1,6 +1,4 @@
 #include "pushbutton.h"
-#include "getcolor.h"
-#include "sliderwidthvalueshow.h"
 
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -10,11 +8,12 @@
 #include <QGroupBox>
 #include <QSpinBox>
 #include <QTabWidget>
+#include <QLineEdit>
 #include <QRegExp>
 #include <QDebug>
 #include <QLabel>
 #include <QFont>
-PushButtonPage::PushButtonPage(QWidget *parent) : QWidget (parent)
+PushButtonTabPage::PushButtonTabPage(QWidget *parent) : QWidget (parent)
 {
     pushBtn = new MyPushButton("test");
     pushBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -26,77 +25,311 @@ PushButtonPage::PushButtonPage(QWidget *parent) : QWidget (parent)
     QHBoxLayout *hLayoutPushBtn = new QHBoxLayout;
     hLayoutPushBtn->addWidget(pushBtn);
 
-    styleTab = new PushBtnStyleTab;
+    lineEdit = new QLineEdit;
+    lineEdit->setPlaceholderText("请输入预览字符串");
+    lineEdit->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+
+    //为了让行编辑器在中间
+    QHBoxLayout *hLayoutLineEdit = new QHBoxLayout;
+    hLayoutLineEdit->addWidget(lineEdit);
+
+    styleTab = new PushBtnStyleTabWidget;
 
     QVBoxLayout *vLayout = new QVBoxLayout;
     vLayout->addLayout(hLayoutPushBtn);
     vLayout->addStretch(1);
+    vLayout->addLayout(hLayoutLineEdit);
     vLayout->addWidget(styleTab);
 
     setLayout(vLayout);
 
-    connect(styleTab, &PushBtnStyleTab::styleChanged, pushBtn, &MyPushButton::setQSS);
-
+    connect(styleTab, &PushBtnStyleTabWidget::styleChanged, pushBtn, &MyPushButton::setQSS);
+    connect(lineEdit, &QLineEdit::editingFinished, this, [&]() {
+        pushBtn->setText(lineEdit->displayText());
+    });
 }
 
-PushBtnStyleTab::PushBtnStyleTab(QWidget *parent) : QTabWidget (parent)
+PushBtnStyleTabWidget::PushBtnStyleTabWidget(QWidget *parent) : QTabWidget (parent)
 {
-    normalWidget = new NormalStyleWidget;
-    normalArea = new NormalStyleArea;
-    normalArea->setWidget(normalWidget);
+    normalTabPage = new NormalStyleTabPage;
+    normalScrollArea = new NormalStyleArea;
+    normalScrollArea->setWidget(normalTabPage);
 
-    addTab(normalArea, "Normal");
+    hoverTabPage = new HoverStyleTabPage;
+    hoverScrollArea = new HoverStyleArea;
+    hoverScrollArea->setWidget(hoverTabPage);
+
+    pressedTabPage = new PressedStyleTabPage;
+    pressedScrollArea = new PressedStyleArea;
+    pressedScrollArea->setWidget(pressedTabPage);
+
+    checkedTabPage = new CheckedStyleTabPage;
+    checkedStyleArea = new CheckedStyleArea;
+    checkedStyleArea->setWidget(checkedTabPage);
+
+    addTab(normalScrollArea, "Normal");
+    addTab(hoverScrollArea, "Hover");
+    addTab(pressedScrollArea, "Pressed");
+    addTab(checkedStyleArea, "Checked");
     setTabPosition(QTabWidget::West);
     setTabShape(QTabWidget::Triangular);
 
-    connect(normalWidget, &NormalStyleWidget::normalStyleChanged, this, &PushBtnStyleTab::changeNormalStyleStr);
+    connect(normalTabPage, &NormalStyleTabPage::normalStyleChanged, this, &PushBtnStyleTabWidget::changeNormalStyleStr);
+    connect(hoverTabPage, &HoverStyleTabPage::hoverStyleChanged, this, &PushBtnStyleTabWidget::changeHoverStyleStr);
+    connect(pressedTabPage, &PressedStyleTabPage::pressedStyleChanged, this, &PushBtnStyleTabWidget::changePressedStyleStr);
+    connect(checkedTabPage, &CheckedStyleTabPage::checkedStyleChanged, this, &PushBtnStyleTabWidget::changeCheckedStyleStr);
 }
 
-void PushBtnStyleTab::changeNormalStyleStr(QString str)
+void PushBtnStyleTabWidget::changeNormalStyleStr(QString str)
 {
     normalStyleStr = str;
     changeStyleStr();
 }
 
-void PushBtnStyleTab::changeStyleStr()
+void PushBtnStyleTabWidget::changeHoverStyleStr(QString str)
 {
-    QString styleStr = normalStyleStr + pressedStyleStr
-            + checkedStyleStr + hoverStyleStr;
+    hoverStyleStr = str;
+    changeStyleStr();
+}
+
+void PushBtnStyleTabWidget::changePressedStyleStr(QString str)
+{
+    pressedStyleStr = str;
+    changeStyleStr();
+}
+
+void PushBtnStyleTabWidget::changeCheckedStyleStr(QString str)
+{
+    checkedStyleStr = str;
+    changeStyleStr();
+}
+
+void PushBtnStyleTabWidget::changeStyleStr()
+{
+    QString styleStr = normalStyleStr + hoverStyleStr +
+            pressedStyleStr + checkedStyleStr;
+    qDebug() << styleStr;
     emit styleChanged(styleStr);
 }
 
-NormalStyleWidget::NormalStyleWidget(QWidget *parent) : QWidget (parent)
+PressedStyleTabPage::PressedStyleTabPage(QWidget *parent) : QWidget (parent)
+{
+    QVBoxLayout *vlayout =  initPanel();
+    setLayout(vlayout);
+
+    connect(borderColor, &GetColor::colorChanged, this, &PressedStyleTabPage::borderColorChange);
+    connect(backGroundColor, &GetColor::colorChanged, this, &PressedStyleTabPage::backGroundColorChange);
+    connect(fontColor, &GetColor::colorChanged, this, &PressedStyleTabPage::fontColorChange);
+    connect(borderSize, &SliderWidthValueShow::valueChanged, this, &PressedStyleTabPage::borderSizeChange);
+    connect(radiusSize, &SliderWidthValueShow::valueChanged, this, &PressedStyleTabPage::radiusSizeChange);
+}
+
+QVBoxLayout *PressedStyleTabPage::initPanel()
+{
+    borderColor = new GetColor("边界颜色");
+    backGroundColor = new GetColor("背景颜色");
+    fontColor = new GetColor("字体颜色");
+    borderSize = new SliderWidthValueShow("边界宽度", 0, 20);
+    radiusSize = new SliderWidthValueShow("圆角尺寸", 0, 42);
+
+    QVBoxLayout *vLayout = new QVBoxLayout;
+    vLayout->addWidget(borderColor);
+    vLayout->addWidget(backGroundColor);
+    vLayout->addWidget(fontColor);
+    vLayout->addWidget(borderSize);
+    vLayout->addWidget(radiusSize);
+
+    return vLayout;
+}
+
+void PressedStyleTabPage::borderColorChange(QString str)
+{
+    borderColorStr = "border-color: rgba" + str;
+    upDatePressedStyle();
+}
+void PressedStyleTabPage::backGroundColorChange(QString str)
+{
+    backGroundColorStr = "background-color: rgba" + str;
+    upDatePressedStyle();
+}
+void PressedStyleTabPage::fontColorChange(QString str)
+{
+    fontColorStr = "color: rgba" + str;
+    upDatePressedStyle();
+}
+void PressedStyleTabPage::borderSizeChange(QString str)
+{
+    borderSizeStr = "border-width: " + str + "border-style: solid;" ;
+    upDatePressedStyle();
+}
+void PressedStyleTabPage::radiusSizeChange(QString str)
+{
+    radiusSizeStr = "border-radius: " + str;
+    upDatePressedStyle();
+}
+
+void PressedStyleTabPage::upDatePressedStyle()
+{
+    QString str;
+    str = borderSizeStr + radiusSizeStr + fontColorStr
+            + backGroundColorStr + borderColorStr;
+    str = "QPushButton:pressed {" + str + "}";
+    emit pressedStyleChanged(str);
+}
+
+CheckedStyleTabPage::CheckedStyleTabPage(QWidget *parent) : QWidget (parent)
+{
+    QVBoxLayout *vlayout =  initPanel();
+    setLayout(vlayout);
+
+    connect(borderColor, &GetColor::colorChanged, this, &CheckedStyleTabPage::borderColorChange);
+    connect(backGroundColor, &GetColor::colorChanged, this, &CheckedStyleTabPage::backGroundColorChange);
+    connect(fontColor, &GetColor::colorChanged, this, &CheckedStyleTabPage::fontColorChange);
+    connect(borderSize, &SliderWidthValueShow::valueChanged, this, &CheckedStyleTabPage::borderSizeChange);
+    connect(radiusSize, &SliderWidthValueShow::valueChanged, this, &CheckedStyleTabPage::radiusSizeChange);
+}
+
+QVBoxLayout *CheckedStyleTabPage::initPanel()
+{
+    borderColor = new GetColor("边界颜色");
+    backGroundColor = new GetColor("背景颜色");
+    fontColor = new GetColor("字体颜色");
+    borderSize = new SliderWidthValueShow("边界宽度", 0, 20);
+    radiusSize = new SliderWidthValueShow("圆角尺寸", 0, 42);
+
+    QVBoxLayout *vLayout = new QVBoxLayout;
+    vLayout->addWidget(borderColor);
+    vLayout->addWidget(backGroundColor);
+    vLayout->addWidget(fontColor);
+    vLayout->addWidget(borderSize);
+    vLayout->addWidget(radiusSize);
+
+    return vLayout;
+}
+
+void CheckedStyleTabPage::borderColorChange(QString str)
+{
+    borderColorStr = "border-color: rgba" + str;
+    upDateCheckedStyle();
+}
+void CheckedStyleTabPage::backGroundColorChange(QString str)
+{
+    backGroundColorStr = "background-color: rgba" + str;
+    upDateCheckedStyle();
+}
+void CheckedStyleTabPage::fontColorChange(QString str)
+{
+    fontColorStr = "color: rgba" + str;
+    upDateCheckedStyle();
+}
+void CheckedStyleTabPage::borderSizeChange(QString str)
+{
+    borderSizeStr = "border-width: " + str + "border-style: solid;" ;
+    upDateCheckedStyle();
+}
+void CheckedStyleTabPage::radiusSizeChange(QString str)
+{
+    radiusSizeStr = "border-radius: " + str;
+    upDateCheckedStyle();
+}
+
+void CheckedStyleTabPage::upDateCheckedStyle()
+{
+    QString str;
+    str = borderSizeStr + radiusSizeStr + fontColorStr
+            + backGroundColorStr + borderColorStr;
+    str = "QPushButton:checked {" + str + "}";
+    emit checkedStyleChanged(str);
+}
+
+HoverStyleTabPage::HoverStyleTabPage(QWidget *parent) : QWidget (parent)
+{
+    QVBoxLayout *vlayout =  initPanel();
+    setLayout(vlayout);
+
+    connect(borderColor, &GetColor::colorChanged, this, &HoverStyleTabPage::borderColorChange);
+    connect(backGroundColor, &GetColor::colorChanged, this, &HoverStyleTabPage::backGroundColorChange);
+    connect(fontColor, &GetColor::colorChanged, this, &HoverStyleTabPage::fontColorChange);
+    connect(borderSize, &SliderWidthValueShow::valueChanged, this, &HoverStyleTabPage::borderSizeChange);
+    connect(radiusSize, &SliderWidthValueShow::valueChanged, this, &HoverStyleTabPage::radiusSizeChange);
+}
+
+QVBoxLayout *HoverStyleTabPage::initPanel()
+{
+    borderColor = new GetColor("边界颜色");
+    backGroundColor = new GetColor("背景颜色");
+    fontColor = new GetColor("字体颜色");
+    borderSize = new SliderWidthValueShow("边界宽度", 0, 20);
+    radiusSize = new SliderWidthValueShow("圆角尺寸", 0, 42);
+
+    QVBoxLayout *vLayout = new QVBoxLayout;
+    vLayout->addWidget(borderColor);
+    vLayout->addWidget(backGroundColor);
+    vLayout->addWidget(fontColor);
+    vLayout->addWidget(borderSize);
+    vLayout->addWidget(radiusSize);
+
+    return vLayout;
+}
+
+void HoverStyleTabPage::borderColorChange(QString str)
+{
+    borderColorStr = "border-color: rgba" + str;
+    upDateHoverStyle();
+}
+void HoverStyleTabPage::backGroundColorChange(QString str)
+{
+    backGroundColorStr = "background-color: rgba" + str;
+    upDateHoverStyle();
+}
+void HoverStyleTabPage::fontColorChange(QString str)
+{
+    fontColorStr = "color: rgba" + str;
+    upDateHoverStyle();
+}
+void HoverStyleTabPage::borderSizeChange(QString str)
+{
+    borderSizeStr = "border-width: " + str + "border-style: solid;" ;
+    upDateHoverStyle();
+}
+void HoverStyleTabPage::radiusSizeChange(QString str)
+{
+    radiusSizeStr = "border-radius: " + str;
+    upDateHoverStyle();
+}
+
+void HoverStyleTabPage::upDateHoverStyle()
+{
+    QString str;
+    str = borderSizeStr + radiusSizeStr + fontColorStr
+            + backGroundColorStr + borderColorStr;
+    str = "QPushButton:hover {" + str + "}";
+    emit hoverStyleChanged(str);
+}
+
+NormalStyleTabPage::NormalStyleTabPage(QWidget *parent) : QWidget (parent)
 {
 
     QVBoxLayout *vlayout =  initPanel();
 
     setLayout(vlayout);
-    void borderColorChange(QString str);
-    void backGroundColorChange(QString str);
-    void fontColorChange(QString str);
-    void fontFamilyChange(QString str);
-    void hSizeChange(QString str);
-    void vSizeChange(QString str);
-    void borderSizeChange(QString str);
-    void fontSizeChange(QString str);
-    void radiusSizeChange(QString str);
 
-    connect(borderColor, &GetColor::colorChanged, this, &NormalStyleWidget::borderColorChange);
-    connect(backGroundColor, &GetColor::colorChanged, this, &NormalStyleWidget::backGroundColorChange);
-    connect(fontColor, &GetColor::colorChanged, this, &NormalStyleWidget::fontColorChange);
-    connect(fontFamily, &QFontComboBox::currentFontChanged, this, &NormalStyleWidget::fontFamilyChange);
-    connect(hSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleWidget::hSizeChange);
-    connect(vSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleWidget::vSizeChange);
-    connect(borderSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleWidget::borderSizeChange);
-    connect(fontSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleWidget::fontSizeChange);
-    connect(radiusSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleWidget::radiusSizeChange);
-    connect(italicAndBold, &ItalicAndBoldWidget::styleChanged, this, &NormalStyleWidget::italicAndBoldChange);
-    connect(alignAndDec, &AlignAndDecorationWidget::styleChanged, this, &NormalStyleWidget::alignAndDecChange);
-    connect(shadowEffect, &ShadowEffectWidget::styleChanged, this, &NormalStyleWidget::shadowChange);
+    connect(borderColor, &GetColor::colorChanged, this, &NormalStyleTabPage::borderColorChange);
+    connect(backGroundColor, &GetColor::colorChanged, this, &NormalStyleTabPage::backGroundColorChange);
+    connect(fontColor, &GetColor::colorChanged, this, &NormalStyleTabPage::fontColorChange);
+    connect(fontFamily, &QFontComboBox::currentFontChanged, this, &NormalStyleTabPage::fontFamilyChange);
+    connect(hSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleTabPage::hSizeChange);
+    connect(vSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleTabPage::vSizeChange);
+    connect(borderSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleTabPage::borderSizeChange);
+    connect(fontSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleTabPage::fontSizeChange);
+    connect(radiusSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleTabPage::radiusSizeChange);
+    connect(italicAndBold, &ItalicAndBoldWidget::styleChanged, this, &NormalStyleTabPage::italicAndBoldChange);
+    connect(alignAndDec, &AlignAndDecorationWidget::styleChanged, this, &NormalStyleTabPage::alignAndDecChange);
+    connect(shadowEffect, &ShadowEffectWidget::styleChanged, this, &NormalStyleTabPage::shadowChange);
 
 }
 
-QVBoxLayout *NormalStyleWidget::initPanel()
+QVBoxLayout *NormalStyleTabPage::initPanel()
 {
     borderColor = new GetColor("边界颜色");
     backGroundColor = new GetColor("背景颜色");
@@ -112,87 +345,87 @@ QVBoxLayout *NormalStyleWidget::initPanel()
     shadowEffect = new ShadowEffectWidget;
 
     QVBoxLayout *vLayout = new QVBoxLayout;
-    vLayout->addWidget(borderColor);
+    vLayout->addWidget(vSize);
+    vLayout->addWidget(hSize);
+    vLayout->addWidget(radiusSize);
     vLayout->addWidget(backGroundColor);
+    vLayout->addWidget(borderSize);
+    vLayout->addWidget(borderColor);
+    vLayout->addWidget(fontSize);
     vLayout->addWidget(fontColor);
     vLayout->addWidget(fontFamily);
     vLayout->addWidget(italicAndBold);
     vLayout->addWidget(alignAndDec);
-    vLayout->addWidget(fontSize);
-    vLayout->addWidget(vSize);
-    vLayout->addWidget(hSize);
-    vLayout->addWidget(borderSize);
-    vLayout->addWidget(radiusSize);
     vLayout->addWidget(shadowEffect);
 
     return vLayout;
 }
 
-void NormalStyleWidget::shadowChange(QString str)
+void NormalStyleTabPage::shadowChange(QString str)
 {
     shadowStyleStr = "box-shadow: " + str;
     upDateNormalStyle();
 }
 
-void NormalStyleWidget::alignAndDecChange(QString str)
+void NormalStyleTabPage::alignAndDecChange(QString str)
 {
     alignAndDecStr = str;
     upDateNormalStyle();
 }
 
-void NormalStyleWidget::italicAndBoldChange(QString str)
+void NormalStyleTabPage::italicAndBoldChange(QString str)
 {
     italicAndBoldStr = str;
     upDateNormalStyle();
 }
-void NormalStyleWidget::borderColorChange(QString str)
+void NormalStyleTabPage::borderColorChange(QString str)
 {
     borderColorStr = "border-color: rgba" + str;
     upDateNormalStyle();
 }
-void NormalStyleWidget::backGroundColorChange(QString str)
+void NormalStyleTabPage::backGroundColorChange(QString str)
 {
     backGroundColorStr = "background-color: rgba" + str;
     upDateNormalStyle();
 }
-void NormalStyleWidget::fontColorChange(QString str)
+void NormalStyleTabPage::fontColorChange(QString str)
 {
     fontColorStr = "color: rgba" + str;
     upDateNormalStyle();
 }
-void NormalStyleWidget::fontFamilyChange(QFont font)
+void NormalStyleTabPage::fontFamilyChange(QFont font)
 {
     fontFamilyStr = "font-family: " + font.family() + ";";
     upDateNormalStyle();
 }
-void NormalStyleWidget::hSizeChange(QString str)
+void NormalStyleTabPage::hSizeChange(QString str)
 {
     hSizeStr = "min-width:" + str + "max-width:" + str ;
     upDateNormalStyle();
 }
 
-void NormalStyleWidget::vSizeChange(QString str)
+void NormalStyleTabPage::vSizeChange(QString str)
 {
     vSizeStr = "min-height:" + str + "max-height:" + str;
     upDateNormalStyle();
 }
-void NormalStyleWidget::borderSizeChange(QString str)
+void NormalStyleTabPage::borderSizeChange(QString str)
 {
     borderSizeStr = "border-width: " + str + "border-style: solid;" ;
     upDateNormalStyle();
 }
-void NormalStyleWidget::fontSizeChange(QString str)
+void NormalStyleTabPage::fontSizeChange(QString str)
 {
     fontSizeStr = "font-size: " + str;
     upDateNormalStyle();
 }
-void NormalStyleWidget::radiusSizeChange(QString str)
+void NormalStyleTabPage::radiusSizeChange(QString str)
 {
     radiusSizeStr = "border-radius: " + str;
     upDateNormalStyle();
 }
 
-void NormalStyleWidget::upDateNormalStyle()
+void NormalStyleTabPage::upDateNormalStyle()
 {
     QString str;
     str = fontFamilyStr + hSizeStr + vSizeStr + borderSizeStr
@@ -200,6 +433,5 @@ void NormalStyleWidget::upDateNormalStyle()
             + backGroundColorStr + borderColorStr + italicAndBoldStr
             + alignAndDecStr + shadowStyleStr;
     str = "QPushButton {" + str + "}";
-    qDebug() << str;
     emit normalStyleChanged(str);
 }
