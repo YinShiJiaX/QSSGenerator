@@ -27,13 +27,13 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         widget.cpp \
-    buttons.cpp \
-    pushbutton.cpp
+    buttons/buttons.cpp \
+    buttons/pushbutton.cpp
 
 HEADERS += \
         widget.h \
-    buttons.h \
-    pushbutton.h
+    headers/buttons.h \
+    headers/pushbutton.h
 
 FORMS += \
         widget.ui
