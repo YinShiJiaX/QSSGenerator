@@ -1,11 +1,16 @@
 #include "widget.h"
 #include "ui_widget.h"
-#include "buttons.h"
+#include "headers/buttons.h"
+#include "headers/inputwidgets.h"
 
 #include <QStackedWidget>
 #include <QListWidget>
 #include <QHBoxLayout>
 #include <QListWidgetItem>
+#include <QSplitter>
+#include <QFileSystemModel>
+#include <QListView>
+#include <QDebug>
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
@@ -22,21 +27,29 @@ Widget::Widget(QWidget *parent) :
         new QListWidgetItem(widgetsTypeName, listWidget);
     }
 
-    QHBoxLayout *hLayout = new QHBoxLayout;
-    hLayout->addWidget(listWidget);
-    hLayout->addWidget(stackedWidget);
-    hLayout->setStretchFactor(listWidget, 1);
-    hLayout->setStretchFactor(stackedWidget, 6);
+    QSplitter *splitter = new QSplitter;
 
-    setLayout(hLayout);
-    resize(700, 450);
+    splitter->addWidget(listWidget);
+    splitter->addWidget(stackedWidget);
+    splitter->setStretchFactor(0, 1);
+    splitter->setStretchFactor(1, 6);
+
+    QGridLayout *gLayout = new QGridLayout;
+    gLayout->addWidget(splitter);
+
+    setLayout(gLayout);
+    resize(800, 450);
+
+    connect(listWidget, &QListWidget::currentRowChanged, stackedWidget, &QStackedWidget::setCurrentIndex);
 
 }
 
 void Widget::initStackedWidget()
 {
     buttonsTabWidget = new ButtonsTabWidget;
+    inputWidgetsTabWidget = new InputWidgetsTabWidget;
     stackedWidget->addWidget(buttonsTabWidget);
+    stackedWidget->addWidget(inputWidgetsTabWidget);
 }
 
 Widget::~Widget()

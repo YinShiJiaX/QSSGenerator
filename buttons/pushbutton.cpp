@@ -1,4 +1,4 @@
-#include "pushbutton.h"
+#include "headers/pushbutton.h"
 
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -52,19 +52,19 @@ PushButtonTabPage::PushButtonTabPage(QWidget *parent) : QWidget (parent)
 PushBtnStyleTabWidget::PushBtnStyleTabWidget(QWidget *parent) : QTabWidget (parent)
 {
     normalTabPage = new NormalStyleTabPage;
-    normalScrollArea = new NormalStyleArea;
+    normalScrollArea = new MyScrollArea;
     normalScrollArea->setWidget(normalTabPage);
 
     hoverTabPage = new HoverStyleTabPage;
-    hoverScrollArea = new HoverStyleArea;
+    hoverScrollArea = new MyScrollArea;
     hoverScrollArea->setWidget(hoverTabPage);
 
     pressedTabPage = new PressedStyleTabPage;
-    pressedScrollArea = new PressedStyleArea;
+    pressedScrollArea = new MyScrollArea;
     pressedScrollArea->setWidget(pressedTabPage);
 
     checkedTabPage = new CheckedStyleTabPage;
-    checkedStyleArea = new CheckedStyleArea;
+    checkedStyleArea = new MyScrollArea;
     checkedStyleArea->setWidget(checkedTabPage);
 
     addTab(normalScrollArea, "Normal");
@@ -320,12 +320,15 @@ NormalStyleTabPage::NormalStyleTabPage(QWidget *parent) : QWidget (parent)
     connect(fontFamily, &QFontComboBox::currentFontChanged, this, &NormalStyleTabPage::fontFamilyChange);
     connect(hSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleTabPage::hSizeChange);
     connect(vSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleTabPage::vSizeChange);
-    connect(borderSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleTabPage::borderSizeChange);
+    connect(borderWidth, &SliderWidthValueShow::valueChanged, this, &NormalStyleTabPage::borderSizeChange);
     connect(fontSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleTabPage::fontSizeChange);
-    connect(radiusSize, &SliderWidthValueShow::valueChanged, this, &NormalStyleTabPage::radiusSizeChange);
+    connect(borderRadius, &SliderWidthValueShow::valueChanged, this, &NormalStyleTabPage::radiusSizeChange);
     connect(italicAndBold, &ItalicAndBoldWidget::styleChanged, this, &NormalStyleTabPage::italicAndBoldChange);
     connect(alignAndDec, &AlignAndDecorationWidget::styleChanged, this, &NormalStyleTabPage::alignAndDecChange);
     connect(shadowEffect, &ShadowEffectWidget::styleChanged, this, &NormalStyleTabPage::shadowChange);
+    connect(backgroundImage, &ButtonForImageAccess::imageChanged, this, &NormalStyleTabPage::backgroundImageChange);
+    connect(borderImage, &ButtonForImageAccess::imageChanged, this, &NormalStyleTabPage::borderImageChange);
+    connect(contentsImage, &ButtonForImageAccess::imageChanged, this, &NormalStyleTabPage::contentsImageChange);
 
 }
 
@@ -337,19 +340,25 @@ QVBoxLayout *NormalStyleTabPage::initPanel()
     fontFamily = new QFontComboBox;
     vSize = new SliderWidthValueShow("垂直高度", 0, 100);
     hSize = new SliderWidthValueShow("水平宽度", 0, 200);
-    borderSize = new SliderWidthValueShow("边界宽度", 0, 20);
+    borderWidth = new SliderWidthValueShow("边界宽度", 0, 20);
     fontSize = new SliderWidthValueShow("字体大小", 8, 28);
-    radiusSize = new SliderWidthValueShow("圆角尺寸", 0, 42);
+    borderRadius = new SliderWidthValueShow("圆角尺寸", 0, 42);
     italicAndBold = new ItalicAndBoldWidget;
     alignAndDec = new AlignAndDecorationWidget;
     shadowEffect = new ShadowEffectWidget;
+    backgroundImage = new ButtonForImageAccess("背景图片");
+    borderImage = new ButtonForImageAccess("边界图片");
+    contentsImage = new ButtonForImageAccess("内容图片");
 
     QVBoxLayout *vLayout = new QVBoxLayout;
     vLayout->addWidget(vSize);
     vLayout->addWidget(hSize);
-    vLayout->addWidget(radiusSize);
+    vLayout->addWidget(borderRadius);
+    vLayout->addWidget(backgroundImage);
+    vLayout->addWidget(borderImage);
+    vLayout->addWidget(contentsImage);
     vLayout->addWidget(backGroundColor);
-    vLayout->addWidget(borderSize);
+    vLayout->addWidget(borderWidth);
     vLayout->addWidget(borderColor);
     vLayout->addWidget(fontSize);
     vLayout->addWidget(fontColor);
@@ -358,7 +367,26 @@ QVBoxLayout *NormalStyleTabPage::initPanel()
     vLayout->addWidget(alignAndDec);
     vLayout->addWidget(shadowEffect);
 
+
     return vLayout;
+}
+
+void NormalStyleTabPage::contentsImageChange(QString str)
+{
+    contentsImageStr = "image: " + QString("url(") + str + ");";
+    upDateNormalStyle();
+}
+
+void NormalStyleTabPage::borderImageChange(QString str)
+{
+    borderImageStr = "border-image: " + QString("url(") + str + ");";
+    upDateNormalStyle();
+}
+
+void NormalStyleTabPage::backgroundImageChange(QString str)
+{
+    backgroundImageStr = "background-image: " + QString("url(") + str + ");";
+    upDateNormalStyle();
 }
 
 void NormalStyleTabPage::shadowChange(QString str)
@@ -385,7 +413,7 @@ void NormalStyleTabPage::borderColorChange(QString str)
 }
 void NormalStyleTabPage::backGroundColorChange(QString str)
 {
-    backGroundColorStr = "background-color: rgba" + str;
+    backgroundColorStr = "background-color: rgba" + str;
     upDateNormalStyle();
 }
 void NormalStyleTabPage::fontColorChange(QString str)
@@ -411,7 +439,7 @@ void NormalStyleTabPage::vSizeChange(QString str)
 }
 void NormalStyleTabPage::borderSizeChange(QString str)
 {
-    borderSizeStr = "border-width: " + str + "border-style: solid;" ;
+    borderWidthStr = "border-width: " + str + "border-style: solid;" ;
     upDateNormalStyle();
 }
 void NormalStyleTabPage::fontSizeChange(QString str)
@@ -421,17 +449,18 @@ void NormalStyleTabPage::fontSizeChange(QString str)
 }
 void NormalStyleTabPage::radiusSizeChange(QString str)
 {
-    radiusSizeStr = "border-radius: " + str;
+    borderRadiusStr = "border-radius: " + str;
     upDateNormalStyle();
 }
 
 void NormalStyleTabPage::upDateNormalStyle()
 {
     QString str;
-    str = fontFamilyStr + hSizeStr + vSizeStr + borderSizeStr
-            + fontSizeStr + radiusSizeStr + fontColorStr
-            + backGroundColorStr + borderColorStr + italicAndBoldStr
-            + alignAndDecStr + shadowStyleStr;
+    str = fontFamilyStr + hSizeStr + vSizeStr + borderWidthStr
+            + fontSizeStr + borderRadiusStr + fontColorStr
+            + backgroundColorStr + borderColorStr + italicAndBoldStr
+            + alignAndDecStr + shadowStyleStr + backgroundImageStr + borderImageStr
+            + contentsImageStr;
     str = "QPushButton {" + str + "}";
     emit normalStyleChanged(str);
 }

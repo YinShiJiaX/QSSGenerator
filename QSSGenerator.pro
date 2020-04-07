@@ -28,12 +28,17 @@ SOURCES += \
         main.cpp \
         widget.cpp \
     buttons/buttons.cpp \
-    buttons/pushbutton.cpp
+    buttons/pushbutton.cpp \
+    inputwidgets/inputwidgets.cpp \
+    inputwidgets/slider.cpp \
 
 HEADERS += \
         widget.h \
     headers/buttons.h \
-    headers/pushbutton.h
+    headers/pushbutton.h \
+    headers/inputwidgets.h \
+    headers/slider.h \
+    common.h
 
 FORMS += \
         widget.ui

@@ -1,5 +1,5 @@
-#include "buttons.h"
-#include "pushbutton.h"
+#include "headers/buttons.h"
+#include "headers/pushbutton.h"
 
 #include <QTabWidget>
 
