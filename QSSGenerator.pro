@@ -31,6 +31,8 @@ SOURCES += \
     buttons/pushbutton.cpp \
     inputwidgets/inputwidgets.cpp \
     inputwidgets/slider.cpp \
+    displaywidgets/displaywidgets.cpp \
+    displaywidgets/progressbar.cpp
 
 HEADERS += \
         widget.h \
@@ -38,7 +40,9 @@ HEADERS += \
     headers/pushbutton.h \
     headers/inputwidgets.h \
     headers/slider.h \
-    common.h
+    common.h \
+    headers/displaywidgets.h \
+    headers/progressbar.h
 
 FORMS += \
         widget.ui

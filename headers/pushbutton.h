@@ -25,16 +25,16 @@ class QSpinBox;
 class QFontComboBox;
 class PushBtnStyleTabWidget;
 class NormalStyleArea;
-class NormalStyleTabPage;
+class PushButtonTopStyleTabPage;
 class QFont;
 class ItalicAndBoldWidget;
 class ShadowEffectWidget;
 class AlignAndDecorationWidget;
-class HoverStyleTabPage;
+class PushButtonHoverStyleTabPage;
 class HoverStyleArea;
-class PressedStyleTabPage;
+class PushButtonPressedStyleTabPage;
 class PressedStyleArea;
-class CheckedStyleTabPage;
+class PushButtonCheckedStyleTabPage;
 class CheckedStyleArea;
 class ButtonForImageAccess;
 #define WMIN 0
@@ -85,10 +85,10 @@ private:
     MyScrollArea *hoverScrollArea;
     MyScrollArea *pressedScrollArea;
     MyScrollArea *checkedStyleArea;
-    NormalStyleTabPage *normalTabPage;
-    HoverStyleTabPage *hoverTabPage;
-    PressedStyleTabPage *pressedTabPage;
-    CheckedStyleTabPage *checkedTabPage;
+    PushButtonTopStyleTabPage *normalTabPage;
+    PushButtonHoverStyleTabPage *hoverTabPage;
+    PushButtonPressedStyleTabPage *pressedTabPage;
+    PushButtonCheckedStyleTabPage *checkedTabPage;
 };
 
 
@@ -264,118 +264,118 @@ signals:
 };
 
 //pushButton Hover样式设定面板
-class HoverStyleTabPage : public QWidget
+class PushButtonHoverStyleTabPage : public QWidget
 {
     Q_OBJECT
 public:
-    HoverStyleTabPage(QWidget *parent = nullptr);
+    PushButtonHoverStyleTabPage(QWidget *parent = nullptr);
     QVBoxLayout *initPanel();
 
 private:
     GetColor *borderColor;
-    GetColor *backGroundColor;
+    GetColor *backgroundColor;
     GetColor *fontColor;
-    SliderWidthValueShow *radiusSize;
-    SliderWidthValueShow *borderSize;
+    SliderWidthValueShow *borderRadius;
+    SliderWidthValueShow *borderWidth;
 
-    QString borderSizeStr = "border-width: 0px;";
-    QString radiusSizeStr = "border-radius: 0px;";
+    QString borderWidthStr = "border-width: 0px;";
+    QString BorderRadiusStr = "border-radius: 0px;";
     QString fontColorStr = "color: black;";
-    QString backGroundColorStr = "background-color: gray;";
+    QString backgroundColorStr = "background-color: gray;";
     QString borderColorStr = "border-color: red;";
 
 private slots:
-    void borderColorChange(QString str);
-    void backGroundColorChange(QString str);
-    void fontColorChange(QString str);
-    void borderSizeChange(QString str);
-    void radiusSizeChange(QString str);
+    void changeBorderColorStr(QString str);
+    void changeBackgroundColorStr(QString str);
+    void changeFontColorStr(QString str);
+    void changeBorderSizeStr(QString str);
+    void changeBorderRadiusStr(QString str);
 
-    void upDateHoverStyle();
+    void upDateStyle();
 signals:
-    void hoverStyleChanged(QString str);
+    void styleChanged(QString str);
 
 };
 
 //pushButton Hover样式设定面板
-class CheckedStyleTabPage : public QWidget
+class PushButtonCheckedStyleTabPage : public QWidget
 {
     Q_OBJECT
 public:
-    CheckedStyleTabPage(QWidget *parent = nullptr);
+    PushButtonCheckedStyleTabPage(QWidget *parent = nullptr);
     QVBoxLayout *initPanel();
 
 private:
     GetColor *borderColor;
-    GetColor *backGroundColor;
+    GetColor *backgroundColor;
     GetColor *fontColor;
-    SliderWidthValueShow *radiusSize;
-    SliderWidthValueShow *borderSize;
+    SliderWidthValueShow *borderRadius;
+    SliderWidthValueShow *borderWidth;
 
-    QString borderSizeStr = "border-width: 0px;";
-    QString radiusSizeStr = "border-radius: 0px;";
+    QString borderWidthStr = "border-width: 0px;";
+    QString borderRadiusStr = "border-radius: 0px;";
     QString fontColorStr = "color: black;";
-    QString backGroundColorStr = "background-color: gray;";
+    QString backgroundColorStr = "background-color: gray;";
     QString borderColorStr = "border-color: red;";
 
 private slots:
-    void borderColorChange(QString str);
-    void backGroundColorChange(QString str);
-    void fontColorChange(QString str);
-    void borderSizeChange(QString str);
-    void radiusSizeChange(QString str);
+    void changeBorderColorStr(QString str);
+    void changeBackgroundColorStr(QString str);
+    void changeFontColorStr(QString str);
+    void changeBorderWidthStr(QString str);
+    void changeBorderRadiusStr(QString str);
 
-    void upDateCheckedStyle();
+    void upDateStyle();
 signals:
-    void checkedStyleChanged(QString str);
+    void styleChanged(QString str);
 };
 
 //pushButton pressed样式设定面板
-class PressedStyleTabPage : public QWidget
+class PushButtonPressedStyleTabPage : public QWidget
 {
     Q_OBJECT
 public:
-    PressedStyleTabPage(QWidget *parent = nullptr);
+    PushButtonPressedStyleTabPage(QWidget *parent = nullptr);
     QVBoxLayout *initPanel();
 
 private:
     GetColor *borderColor;
-    GetColor *backGroundColor;
+    GetColor *backgroundColor;
     GetColor *fontColor;
-    SliderWidthValueShow *radiusSize;
-    SliderWidthValueShow *borderSize;
+    SliderWidthValueShow *borderRadius;
+    SliderWidthValueShow *borderWidth;
 
-    QString borderSizeStr = "border-width: 0px;";
-    QString radiusSizeStr = "border-radius: 0px;";
+    QString borderWidthStr = "border-width: 0px;";
+    QString borderRadiusStr = "border-radius: 0px;";
     QString fontColorStr = "color: black;";
-    QString backGroundColorStr = "background-color: gray;";
+    QString backgroundColorStr = "background-color: gray;";
     QString borderColorStr = "border-color: red;";
 
 private slots:
-    void borderColorChange(QString str);
-    void backGroundColorChange(QString str);
-    void fontColorChange(QString str);
-    void borderSizeChange(QString str);
-    void radiusSizeChange(QString str);
+    void changeBorderColorStr(QString str);
+    void changeBackgroundColorStr(QString str);
+    void changeFontColorStr(QString str);
+    void changeBorderWidthStr(QString str);
+    void changeBorderRadiusStr(QString str);
 
-    void upDatePressedStyle();
+    void upDateStyle();
 signals:
-    void pressedStyleChanged(QString str);
+    void styleChanged(QString str);
 
 };
 
 //pushButton Normal样式设定面板
-class NormalStyleTabPage : public QWidget
+class PushButtonTopStyleTabPage : public QWidget
 {
     Q_OBJECT
 
 public:
-    NormalStyleTabPage(QWidget *parent = nullptr);
+    PushButtonTopStyleTabPage(QWidget *parent = nullptr);
     QVBoxLayout *initPanel();
 
 private:
     GetColor *borderColor;
-    GetColor *backGroundColor;
+    GetColor *backgroundColor;
     GetColor *fontColor;
     QFontComboBox *fontFamily;
     SliderWidthValueShow *hSize, *vSize, *borderWidth, *fontSize;
@@ -404,26 +404,26 @@ private:
     QString contentsImageStr = "";
 
 public slots:
-    void borderColorChange(QString str);
-    void backGroundColorChange(QString str);
-    void fontColorChange(QString str);
-    void fontFamilyChange(QFont font);
-    void hSizeChange(QString str);
-    void vSizeChange(QString str);
-    void borderSizeChange(QString str);
-    void fontSizeChange(QString str);
-    void radiusSizeChange(QString str);
-    void italicAndBoldChange(QString str);
-    void alignAndDecChange(QString str);
-    void shadowChange(QString str);
-    void backgroundImageChange(QString str);
-    void borderImageChange(QString str);
-    void contentsImageChange(QString str);
+    void changeBorderColorStr(QString str);
+    void changeBackgroundColorStr(QString str);
+    void changeFontColorStr(QString str);
+    void changeFontFamilyStr(QFont font);
+    void changehSizeStr(QString str);
+    void changevSizeStr(QString str);
+    void changeBorderWidthStr(QString str);
+    void changeFontSizeStr(QString str);
+    void changeBorderRadiusStr(QString str);
+    void changeItalicAndBoldStr(QString str);
+    void changeAlignAndDecStr(QString str);
+    void changeShadowStr(QString str);
+    void changeBackgroundImageStr(QString str);
+    void changeBorderImageStr(QString str);
+    void changeContentsImageStr(QString str);
 
-    void upDateNormalStyle();
+    void upDateStyle();
 
 signals:
-    void normalStyleChanged(QString str);
+    void styleChanged(QString str);
 };
 
 

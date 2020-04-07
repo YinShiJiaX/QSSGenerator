@@ -2,6 +2,7 @@
 #include "ui_widget.h"
 #include "headers/buttons.h"
 #include "headers/inputwidgets.h"
+#include "headers/displaywidgets.h"
 
 #include <QStackedWidget>
 #include <QListWidget>
@@ -48,8 +49,10 @@ void Widget::initStackedWidget()
 {
     buttonsTabWidget = new ButtonsTabWidget;
     inputWidgetsTabWidget = new InputWidgetsTabWidget;
+    displayWidgetsTabWidget = new DisplayWidgetsTabWidget;
     stackedWidget->addWidget(buttonsTabWidget);
     stackedWidget->addWidget(inputWidgetsTabWidget);
+    stackedWidget->addWidget(displayWidgetsTabWidget);
 }
 
 Widget::~Widget()

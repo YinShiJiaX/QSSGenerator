@@ -13,6 +13,41 @@
   <property name="windowTitle">
    <string>Widget</string>
   </property>
+  <widget class="QProgressBar" name="progressBar">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>120</y>
+     <width>231</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">  QProgressBar {
+      border: 2px solid grey;
+      border-radius: 5px;
+  }
+
+  QProgressBar::chunk {
+      background-color: #05B8CC;
+      width: 20px;
+  }
+
+  QProgressBar {
+      border: 2px solid grey;
+      border-radius: 5px;
+      text-align: center;
+  }
+  QProgressBar::chunk {
+      background-color: #CD96CD;
+      width: 10px;
+      margin: 0.5px;
+  }</string>
+   </property>
+   <property name="value">
+    <number>24</number>
+   </property>
+  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

@@ -8,6 +8,7 @@ class QListWidget;
 class QTabWidget;
 class ButtonsTabWidget;
 class InputWidgetsTabWidget;
+class DisplayWidgetsTabWidget;
 
 namespace Ui {
 class Widget;
@@ -28,10 +29,12 @@ private:
     QStackedWidget *stackedWidget;
 
     QStringList widgetsTypeNameList = {"Buttons",
-                                      "Input Widgets"};
+                                      "Input Widgets",
+                                      "Display Widgets"};
 
     ButtonsTabWidget *buttonsTabWidget;
     InputWidgetsTabWidget *inputWidgetsTabWidget;
+    DisplayWidgetsTabWidget *displayWidgetsTabWidget;
 
 };
 

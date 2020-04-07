@@ -7,15 +7,15 @@
 #include <QSlider>
 #include <QTabWidget>
 #include <QVBoxLayout>
-#include <QScrollArea>
 
+class SliderTabPage;
 class SliderStyleTabWidget;
-class BackgroundStyleTabPage;
-class GrooveStyleTabPage;
-class HandleStyleTabPage;
-class SubStyleTabPage;
-class AddStyleTabPage;
-//pushButton 样式生成总页面
+class SliderTopStyleTabPage;
+class SliderGrooveStyleTabPage;
+class SliderHandleStyleTabPage;
+class SliderSubStyleTabPage;
+class SliderAddStyleTabPage;
+//slider 样式生成总页面
 class SliderTabPage : public QWidget
 {
     Q_OBJECT
@@ -40,42 +40,40 @@ private:
     QString handleStr;
     QString addStr;
     QString subStr;
-    QString backgroundStr;
+    QString topStr;
 
-    BackgroundStyleTabPage *backgroundTabPage;
-    MyScrollArea *backgroundScrollArea;
-    GrooveStyleTabPage *grooveTabPage;
+    SliderTopStyleTabPage *topTabPage;
+    MyScrollArea *topScrollArea;
+    SliderGrooveStyleTabPage *grooveTabPage;
     MyScrollArea *grooveScrollArea;
-    HandleStyleTabPage *handleTabPage;
+    SliderHandleStyleTabPage *handleTabPage;
     MyScrollArea *handleScrollArea;
-    SubStyleTabPage *subTabPage;
+    SliderSubStyleTabPage *subTabPage;
     MyScrollArea *subScrollArea;
-    AddStyleTabPage *addTabPage;
+    SliderAddStyleTabPage *addTabPage;
     MyScrollArea *addScrollArea;
-public slots:
-    void changeBackgroundStyleStr(QString str);
+private slots:
+    void changeTopStyleStr(QString str);
     void changeGrooveStyleStr(QString str);
     void changeHandleStyleStr(QString str);
     void changeSubStyleStr(QString str);
     void changeAddStyleStr(QString str);
 
-
-    void changeStyleStr();
-
+    void upDateStyle();
 signals:
-    void styleChanged(QString styleStr);
+    void styleChanged(QString str);
 
 
 };
 
-class BackgroundStyleTabPage : public QWidget
+class SliderTopStyleTabPage : public QWidget
 {
     Q_OBJECT
 public:
-    BackgroundStyleTabPage(QWidget *parent = nullptr);
+    SliderTopStyleTabPage(QWidget *parent = nullptr);
 
-    QVBoxLayout *initPanel();
 private:
+    QVBoxLayout *initPanel();
     QString backgroundColorStr;
     QString borderColorStr;
     QString borderWidthStr;
@@ -85,7 +83,7 @@ private:
     GetColor *borderColor;
     SliderWidthValueShow *borderWidth;
     SliderWidthValueShow *borderRadius;
-public slots:
+private slots:
     void changeBorderColorStr(QString str);
     void changeBackgroundColorStr(QString str);
     void changeBorderWidthStr(QString str);
@@ -96,11 +94,11 @@ signals:
     void styleChanged(QString str);
 };
 
-class GrooveStyleTabPage : public QWidget
+class SliderGrooveStyleTabPage : public QWidget
 {
     Q_OBJECT
 public:
-    GrooveStyleTabPage(QWidget *parent = nullptr);
+    SliderGrooveStyleTabPage(QWidget *parent = nullptr);
 
     QVBoxLayout *initPanel();
 private:
@@ -127,11 +125,11 @@ signals:
     void styleChanged(QString);
 };
 
-class HandleStyleTabPage : public QWidget
+class SliderHandleStyleTabPage : public QWidget
 {
     Q_OBJECT
 public:
-    HandleStyleTabPage(QWidget *parent = nullptr);
+    SliderHandleStyleTabPage(QWidget *parent = nullptr);
 
     QVBoxLayout *initPanel();
 private:
@@ -170,11 +168,11 @@ signals:
     void styleChanged(QString);
 };
 
-class SubStyleTabPage : public QWidget
+class SliderSubStyleTabPage : public QWidget
 {
     Q_OBJECT
 public:
-    SubStyleTabPage(QWidget *parent = nullptr);
+    SliderSubStyleTabPage(QWidget *parent = nullptr);
 
     QVBoxLayout *initPanel();
 private:
@@ -189,11 +187,11 @@ signals:
     void styleChanged(QString);
 };
 
-class AddStyleTabPage : public QWidget
+class SliderAddStyleTabPage : public QWidget
 {
     Q_OBJECT
 public:
-    AddStyleTabPage(QWidget *parent = nullptr);
+    SliderAddStyleTabPage(QWidget *parent = nullptr);
 
     QVBoxLayout *initPanel();
 private:

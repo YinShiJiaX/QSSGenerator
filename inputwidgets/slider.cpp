@@ -3,6 +3,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QDebug>
+
 SliderTabPage::SliderTabPage(QWidget *parent) : QWidget(parent)
 {
     slider = new QSlider;
@@ -10,13 +11,13 @@ SliderTabPage::SliderTabPage(QWidget *parent) : QWidget(parent)
     slider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     //为了让slider在中间
-    QHBoxLayout *hLayoutPushBtn = new QHBoxLayout;
-    hLayoutPushBtn->addWidget(slider);
+    QHBoxLayout *hLayout = new QHBoxLayout;
+    hLayout->addWidget(slider);
 
     styleTab = new SliderStyleTabWidget;
 
     QVBoxLayout *vLayout = new QVBoxLayout;
-    vLayout->addLayout(hLayoutPushBtn);
+    vLayout->addLayout(hLayout);
     vLayout->addStretch(1);
     vLayout->addWidget(styleTab);
 
@@ -27,27 +28,27 @@ SliderTabPage::SliderTabPage(QWidget *parent) : QWidget(parent)
 
 SliderStyleTabWidget::SliderStyleTabWidget(QWidget *parent) : QTabWidget (parent)
 {
-    backgroundTabPage = new BackgroundStyleTabPage;
-    backgroundScrollArea = new MyScrollArea;
-    backgroundScrollArea->setWidget(backgroundTabPage);
+    topTabPage = new SliderTopStyleTabPage;
+    topScrollArea = new MyScrollArea;
+    topScrollArea->setWidget(topTabPage);
 
-    grooveTabPage = new GrooveStyleTabPage;
+    grooveTabPage = new SliderGrooveStyleTabPage;
     grooveScrollArea = new MyScrollArea;
     grooveScrollArea->setWidget(grooveTabPage);
 
-    handleTabPage = new HandleStyleTabPage;
+    handleTabPage = new SliderHandleStyleTabPage;
     handleScrollArea = new MyScrollArea;
     handleScrollArea->setWidget(handleTabPage);
 
-    subTabPage = new SubStyleTabPage;
+    subTabPage = new SliderSubStyleTabPage;
     subScrollArea = new MyScrollArea;
     subScrollArea->setWidget(subTabPage);
 
-    addTabPage = new AddStyleTabPage;
+    addTabPage = new SliderAddStyleTabPage;
     addScrollArea = new MyScrollArea;
     addScrollArea->setWidget(addTabPage);
 
-    addTab(backgroundScrollArea, "Background");
+    addTab(topScrollArea, "Top");
     addTab(grooveScrollArea, "Groove");
     addTab(handleScrollArea, "Handle");
     addTab(subScrollArea, "Sub");
@@ -55,92 +56,92 @@ SliderStyleTabWidget::SliderStyleTabWidget(QWidget *parent) : QTabWidget (parent
     setTabPosition(QTabWidget::West);
     setTabShape(QTabWidget::Triangular);
 
-    connect(backgroundTabPage, &BackgroundStyleTabPage::styleChanged,
-            this, &SliderStyleTabWidget::changeBackgroundStyleStr);
-    connect(grooveTabPage, &GrooveStyleTabPage::styleChanged,
+    connect(topTabPage, &SliderTopStyleTabPage::styleChanged,
+            this, &SliderStyleTabWidget::changeTopStyleStr);
+    connect(grooveTabPage, &SliderGrooveStyleTabPage::styleChanged,
             this, &SliderStyleTabWidget::changeGrooveStyleStr);
-    connect(handleTabPage, &HandleStyleTabPage::styleChanged,
+    connect(handleTabPage, &SliderHandleStyleTabPage::styleChanged,
             this, &SliderStyleTabWidget::changeHandleStyleStr);
-    connect(subTabPage, &SubStyleTabPage::styleChanged,
+    connect(subTabPage, &SliderSubStyleTabPage::styleChanged,
             this, &SliderStyleTabWidget::changeSubStyleStr);
-    connect(addTabPage, &AddStyleTabPage::styleChanged,
+    connect(addTabPage, &SliderAddStyleTabPage::styleChanged,
             this, &SliderStyleTabWidget::changeAddStyleStr);
 }
 
 void SliderStyleTabWidget::changeSubStyleStr(QString str)
 {
     subStr = str;
-    changeStyleStr();
+    upDateStyle();
 }
 
 void SliderStyleTabWidget::changeAddStyleStr(QString str)
 {
     addStr = str;
-    changeStyleStr();
+    upDateStyle();
 }
 
 void SliderStyleTabWidget::changeHandleStyleStr(QString str)
 {
     handleStr = str;
-    changeStyleStr();
+    upDateStyle();
 }
 
 void SliderStyleTabWidget::changeGrooveStyleStr(QString str)
 {
     grooveStr = str;
-    changeStyleStr();
+    upDateStyle();
 }
 
-void SliderStyleTabWidget::changeBackgroundStyleStr(QString str)
+void SliderStyleTabWidget::changeTopStyleStr(QString str)
 {
-    backgroundStr = str;
-    changeStyleStr();
+    topStr = str;
+    upDateStyle();
 }
 
-void SliderStyleTabWidget::changeStyleStr()
+void SliderStyleTabWidget::upDateStyle()
 {
-    QString styleStr = backgroundStr + grooveStr + handleStr + addStr
+    QString styleStr = topStr + grooveStr + handleStr + addStr
             + subStr;
     qDebug() << styleStr;
     emit styleChanged(styleStr);
 }
 
-BackgroundStyleTabPage::BackgroundStyleTabPage(QWidget *parent) : QWidget(parent)
+SliderTopStyleTabPage::SliderTopStyleTabPage(QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout *vLayout = initPanel();
 
     setLayout(vLayout);
 
-    connect(borderColor, &GetColor::colorChanged, this, &BackgroundStyleTabPage::changeBorderColorStr);
-    connect(borderWidth, &SliderWidthValueShow::valueChanged, this, &BackgroundStyleTabPage::changeBorderWidthStr);
-    connect(backgroundColor, &GetColor::colorChanged, this, &BackgroundStyleTabPage::changeBackgroundColorStr);
-    connect(borderRadius, &SliderWidthValueShow::valueChanged, this, &BackgroundStyleTabPage::changeBorderRadiusStr);
+    connect(borderColor, &GetColor::colorChanged, this, &SliderTopStyleTabPage::changeBorderColorStr);
+    connect(borderWidth, &SliderWidthValueShow::valueChanged, this, &SliderTopStyleTabPage::changeBorderWidthStr);
+    connect(backgroundColor, &GetColor::colorChanged, this, &SliderTopStyleTabPage::changeBackgroundColorStr);
+    connect(borderRadius, &SliderWidthValueShow::valueChanged, this, &SliderTopStyleTabPage::changeBorderRadiusStr);
 }
 
-void BackgroundStyleTabPage::changeBorderColorStr(QString str)
+void SliderTopStyleTabPage::changeBorderColorStr(QString str)
 {
     borderColorStr = "border-color: rgba" + str;
     upDateStyle();
 }
 
-void BackgroundStyleTabPage::changeBackgroundColorStr(QString str)
+void SliderTopStyleTabPage::changeBackgroundColorStr(QString str)
 {
     backgroundColorStr = "background-color: rgba" + str;
     upDateStyle();
 }
-void BackgroundStyleTabPage::changeBorderWidthStr(QString str)
+void SliderTopStyleTabPage::changeBorderWidthStr(QString str)
 {
     borderWidthStr = "border-width: " + str + "border-style: solid;" ;
     upDateStyle();
 }
-void BackgroundStyleTabPage::changeBorderRadiusStr(QString str)
+void SliderTopStyleTabPage::changeBorderRadiusStr(QString str)
 {
     borderRadiusStr = "border-radius: " + str;
     upDateStyle();
 }
 
 
-void BackgroundStyleTabPage::upDateStyle()
+void SliderTopStyleTabPage::upDateStyle()
 {
     QString str;
     str = backgroundColorStr + borderColorStr
@@ -149,7 +150,7 @@ void BackgroundStyleTabPage::upDateStyle()
     emit styleChanged(str);
 }
 
-QVBoxLayout *BackgroundStyleTabPage::initPanel()
+QVBoxLayout *SliderTopStyleTabPage::initPanel()
 {
     backgroundColor = new GetColor("背景颜色");
     borderColor = new GetColor("边界颜色");
@@ -165,48 +166,48 @@ QVBoxLayout *BackgroundStyleTabPage::initPanel()
     return vLayout;
 }
 
-GrooveStyleTabPage::GrooveStyleTabPage(QWidget *parent) : QWidget (parent)
+SliderGrooveStyleTabPage::SliderGrooveStyleTabPage(QWidget *parent) : QWidget (parent)
 {
     QVBoxLayout *vLayout = initPanel();
 
     setLayout(vLayout);
 
-    connect(borderColor, &GetColor::colorChanged, this, &GrooveStyleTabPage::changeBorderColorStr);
-    connect(borderWidth, &SliderWidthValueShow::valueChanged, this, &GrooveStyleTabPage::changeBorderWidthStr);
-    connect(backgroundColor, &GetColor::colorChanged, this, &GrooveStyleTabPage::changeBackgroundColorStr);
-    connect(borderRadius, &SliderWidthValueShow::valueChanged, this, &GrooveStyleTabPage::changeBorderRadiusStr);
-    connect(height, &SliderWidthValueShow::valueChanged, this, &GrooveStyleTabPage::changeHeightStr);
+    connect(borderColor, &GetColor::colorChanged, this, &SliderGrooveStyleTabPage::changeBorderColorStr);
+    connect(borderWidth, &SliderWidthValueShow::valueChanged, this, &SliderGrooveStyleTabPage::changeBorderWidthStr);
+    connect(backgroundColor, &GetColor::colorChanged, this, &SliderGrooveStyleTabPage::changeBackgroundColorStr);
+    connect(borderRadius, &SliderWidthValueShow::valueChanged, this, &SliderGrooveStyleTabPage::changeBorderRadiusStr);
+    connect(height, &SliderWidthValueShow::valueChanged, this, &SliderGrooveStyleTabPage::changeHeightStr);
 }
 
-void GrooveStyleTabPage::changeBorderColorStr(QString str)
+void SliderGrooveStyleTabPage::changeBorderColorStr(QString str)
 {
     borderColorStr = "border-color: rgba" + str;
     upDateStyle();
 }
 
-void GrooveStyleTabPage::changeBackgroundColorStr(QString str)
+void SliderGrooveStyleTabPage::changeBackgroundColorStr(QString str)
 {
     backgroundColorStr = "background-color: rgba" + str;
     upDateStyle();
 }
-void GrooveStyleTabPage::changeBorderWidthStr(QString str)
+void SliderGrooveStyleTabPage::changeBorderWidthStr(QString str)
 {
     borderWidthStr = "border-width: " + str + "border-style: solid;" ;
     upDateStyle();
 }
-void GrooveStyleTabPage::changeBorderRadiusStr(QString str)
+void SliderGrooveStyleTabPage::changeBorderRadiusStr(QString str)
 {
     borderRadiusStr = "border-radius: " + str;
     upDateStyle();
 }
 
-void GrooveStyleTabPage::changeHeightStr(QString str)
+void SliderGrooveStyleTabPage::changeHeightStr(QString str)
 {
     heightStr = "height: " + str;
     upDateStyle();
 }
 
-void GrooveStyleTabPage::upDateStyle()
+void SliderGrooveStyleTabPage::upDateStyle()
 {
     QString str;
     str = backgroundColorStr + borderColorStr
@@ -216,7 +217,7 @@ void GrooveStyleTabPage::upDateStyle()
     emit styleChanged(str);
 }
 
-QVBoxLayout *GrooveStyleTabPage::initPanel()
+QVBoxLayout *SliderGrooveStyleTabPage::initPanel()
 {
     backgroundColor = new GetColor("背景颜色");
     borderColor = new GetColor("边界颜色");
@@ -234,81 +235,81 @@ QVBoxLayout *GrooveStyleTabPage::initPanel()
     return vLayout;
 }
 
-HandleStyleTabPage::HandleStyleTabPage(QWidget *parent) : QWidget (parent)
+SliderHandleStyleTabPage::SliderHandleStyleTabPage(QWidget *parent) : QWidget (parent)
 {
     QVBoxLayout *vLayout = initPanel();
 
     setLayout(vLayout);
 
-    connect(borderColor, &GetColor::colorChanged, this, &HandleStyleTabPage::changeBorderColorStr);
-    connect(borderWidth, &SliderWidthValueShow::valueChanged, this, &HandleStyleTabPage::changeBorderWidthStr);
-    connect(backgroundColor, &GetColor::colorChanged, this, &HandleStyleTabPage::changeBackgroundColorStr);
-    connect(borderRadius, &SliderWidthValueShow::valueChanged, this, &HandleStyleTabPage::changeBorderRadiusStr);
-    connect(width, &SliderWidthValueShow::valueChanged, this, &HandleStyleTabPage::changeWidthStr);
+    connect(borderColor, &GetColor::colorChanged, this, &SliderHandleStyleTabPage::changeBorderColorStr);
+    connect(borderWidth, &SliderWidthValueShow::valueChanged, this, &SliderHandleStyleTabPage::changeBorderWidthStr);
+    connect(backgroundColor, &GetColor::colorChanged, this, &SliderHandleStyleTabPage::changeBackgroundColorStr);
+    connect(borderRadius, &SliderWidthValueShow::valueChanged, this, &SliderHandleStyleTabPage::changeBorderRadiusStr);
+    connect(width, &SliderWidthValueShow::valueChanged, this, &SliderHandleStyleTabPage::changeWidthStr);
     connect(marginTop, &SliderWidthValueShow::valueChanged,
-            this, &HandleStyleTabPage::changeMarginTopStr);
+            this, &SliderHandleStyleTabPage::changeMarginTopStr);
     connect(marginBottom, &SliderWidthValueShow::valueChanged,
-            this, &HandleStyleTabPage::changeMarginBottomStr);
+            this, &SliderHandleStyleTabPage::changeMarginBottomStr);
     connect(marginLeft, &SliderWidthValueShow::valueChanged,
-            this, &HandleStyleTabPage::changeMarginLeftStr);
+            this, &SliderHandleStyleTabPage::changeMarginLeftStr);
     connect(marginRight, &SliderWidthValueShow::valueChanged,
-            this, &HandleStyleTabPage::changeMarginRightStr);
+            this, &SliderHandleStyleTabPage::changeMarginRightStr);
 
 }
 
-void HandleStyleTabPage::changeBorderColorStr(QString str)
+void SliderHandleStyleTabPage::changeBorderColorStr(QString str)
 {
     borderColorStr = "border-color: rgba" + str;
     upDateStyle();
 }
 
-void HandleStyleTabPage::changeBackgroundColorStr(QString str)
+void SliderHandleStyleTabPage::changeBackgroundColorStr(QString str)
 {
     backgroundColorStr = "background-color: rgba" + str;
     upDateStyle();
 }
-void HandleStyleTabPage::changeBorderWidthStr(QString str)
+void SliderHandleStyleTabPage::changeBorderWidthStr(QString str)
 {
     borderWidthStr = "border-width: " + str + "border-style: solid;" ;
     upDateStyle();
 }
-void HandleStyleTabPage::changeBorderRadiusStr(QString str)
+void SliderHandleStyleTabPage::changeBorderRadiusStr(QString str)
 {
     borderRadiusStr = "border-radius: " + str;
     upDateStyle();
 }
 
-void HandleStyleTabPage::changeWidthStr(QString str)
+void SliderHandleStyleTabPage::changeWidthStr(QString str)
 {
     widthStr = "width: " + str;
     upDateStyle();
 }
 
-void HandleStyleTabPage::changeMarginTopStr(QString str)
+void SliderHandleStyleTabPage::changeMarginTopStr(QString str)
 {
     marginTopStr = "margin-top:" + str;
     upDateStyle();
 }
 
-void HandleStyleTabPage::changeMarginBottomStr(QString str)
+void SliderHandleStyleTabPage::changeMarginBottomStr(QString str)
 {
     marginBottomStr = "margin-bottom: " + str;
     upDateStyle();
 }
 
-void HandleStyleTabPage::changeMarginLeftStr(QString str)
+void SliderHandleStyleTabPage::changeMarginLeftStr(QString str)
 {
     marginLeftStr = "margin-left: " + str;
     upDateStyle();
 }
 
-void HandleStyleTabPage::changeMarginRightStr(QString str)
+void SliderHandleStyleTabPage::changeMarginRightStr(QString str)
 {
     marginRightStr = "margin-right: " + str;
     upDateStyle();
 }
 
-void HandleStyleTabPage::upDateStyle()
+void SliderHandleStyleTabPage::upDateStyle()
 {
     QString str;
     str = backgroundColorStr + borderColorStr +
@@ -319,7 +320,7 @@ void HandleStyleTabPage::upDateStyle()
     emit styleChanged(str);
 }
 
-QVBoxLayout *HandleStyleTabPage::initPanel()
+QVBoxLayout *SliderHandleStyleTabPage::initPanel()
 {
     backgroundColor = new GetColor("背景颜色");
     borderColor = new GetColor("边界颜色");
@@ -329,7 +330,7 @@ QVBoxLayout *HandleStyleTabPage::initPanel()
     marginTop = new SliderWidthValueShow("上边界", -10, 5);
     marginBottom = new SliderWidthValueShow("下边界", -10, 5);
     marginLeft = new SliderWidthValueShow("左边界", -10, 10);
-    marginRight = new SliderWidthValueShow("有边界", -10, 10);
+    marginRight = new SliderWidthValueShow("右边界", -10, 10);
 
     QVBoxLayout *vLayout = new QVBoxLayout;
     vLayout->addWidget(backgroundColor);
@@ -345,22 +346,22 @@ QVBoxLayout *HandleStyleTabPage::initPanel()
     return vLayout;
 }
 
-SubStyleTabPage::SubStyleTabPage(QWidget *parent) : QWidget (parent)
+SliderSubStyleTabPage::SliderSubStyleTabPage(QWidget *parent) : QWidget (parent)
 {
     QVBoxLayout *vLayout = initPanel();
 
     setLayout(vLayout);
 
-    connect(backgroundColor, &GetColor::colorChanged, this, &SubStyleTabPage::changeBackgroundColorStr);
+    connect(backgroundColor, &GetColor::colorChanged, this, &SliderSubStyleTabPage::changeBackgroundColorStr);
 }
 
-void SubStyleTabPage::changeBackgroundColorStr(QString str)
+void SliderSubStyleTabPage::changeBackgroundColorStr(QString str)
 {
     backgroundColorStr = "background-color: rgba" + str;
     upDateStyle();
 }
 
-void SubStyleTabPage::upDateStyle()
+void SliderSubStyleTabPage::upDateStyle()
 {
     QString str;
     str = backgroundColorStr;
@@ -368,7 +369,7 @@ void SubStyleTabPage::upDateStyle()
     emit styleChanged(str);
 }
 
-QVBoxLayout *SubStyleTabPage::initPanel()
+QVBoxLayout *SliderSubStyleTabPage::initPanel()
 {
     backgroundColor = new GetColor("背景颜色");
 
@@ -378,22 +379,22 @@ QVBoxLayout *SubStyleTabPage::initPanel()
     return vLayout;
 }
 
-AddStyleTabPage::AddStyleTabPage(QWidget *parent) : QWidget (parent)
+SliderAddStyleTabPage::SliderAddStyleTabPage(QWidget *parent) : QWidget (parent)
 {
     QVBoxLayout *vLayout = initPanel();
 
     setLayout(vLayout);
 
-    connect(backgroundColor, &GetColor::colorChanged, this, &AddStyleTabPage::changeBackgroundColorStr);
+    connect(backgroundColor, &GetColor::colorChanged, this, &SliderAddStyleTabPage::changeBackgroundColorStr);
 }
 
-void AddStyleTabPage::changeBackgroundColorStr(QString str)
+void SliderAddStyleTabPage::changeBackgroundColorStr(QString str)
 {
     backgroundColorStr = "background-color: rgba" + str;
     upDateStyle();
 }
 
-void AddStyleTabPage::upDateStyle()
+void SliderAddStyleTabPage::upDateStyle()
 {
     QString str;
     str = backgroundColorStr;
@@ -401,7 +402,7 @@ void AddStyleTabPage::upDateStyle()
     emit styleChanged(str);
 }
 
-QVBoxLayout *AddStyleTabPage::initPanel()
+QVBoxLayout *SliderAddStyleTabPage::initPanel()
 {
     backgroundColor = new GetColor("背景颜色");
 

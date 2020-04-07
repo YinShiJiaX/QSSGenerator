@@ -11,6 +11,7 @@
 #include <QColorDialog>
 #include <QFileDialog>
 #include <QScrollArea>
+#include <QComboBox>
 //带数值显示的滑块
 class SliderWidthValueShow : public QWidget
 {
@@ -164,4 +165,26 @@ private slots:
         emit imageChanged(path);
     }
 };
+
+class AlignChooseComboBox : public QComboBox
+{
+    Q_OBJECT
+public:
+    AlignChooseComboBox(QWidget *parent=nullptr) : QComboBox(parent)
+    {
+        QStringList alignment = {"center", "top", "bottom", "left", "right"};
+        addItems(alignment);
+        connect(this, QOverload<const QString &>::of(&QComboBox::currentIndexChanged),
+                this, &AlignChooseComboBox::changeAlignStr);
+    }
+
+private:
+    void changeAlignStr(QString str)
+    {
+        emit alignChanged(str);
+    }
+signals:
+    void alignChanged(QString str);
+};
+
 #endif // COMMON_H
