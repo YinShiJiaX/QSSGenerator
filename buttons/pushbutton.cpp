@@ -16,14 +16,25 @@
 PushButtonTabPage::PushButtonTabPage(QWidget *parent) : QWidget (parent)
 {
     pushBtn = new MyPushButton("test");
-    pushBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    pushBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     pushBtn->setCheckable(true);
     pushBtn->setMinimumSize(WMIN, HMIN);
     pushBtn->setMaximumSize(WMAX, HMAX);
 
+    clearSSBtn = new QPushButton("清除当前样式");
+    clearSSBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+
+    generateSSBtn = new QPushButton("生成样式表");
+    generateSSBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+
+    //为了让QSS样式清除按钮居中
+    QHBoxLayout *hLayoutFunBtn = new QHBoxLayout;
+    hLayoutFunBtn->addWidget(clearSSBtn);
+    hLayoutFunBtn->addWidget(generateSSBtn);
+
     //为了让pushBtn在中间
-    QHBoxLayout *hLayoutPushBtn = new QHBoxLayout;
-    hLayoutPushBtn->addWidget(pushBtn);
+    QHBoxLayout *hLayoutShowBtn = new QHBoxLayout;
+    hLayoutShowBtn->addWidget(pushBtn);
 
     lineEdit = new QLineEdit;
     lineEdit->setPlaceholderText("请输入预览字符串");
@@ -36,16 +47,30 @@ PushButtonTabPage::PushButtonTabPage(QWidget *parent) : QWidget (parent)
     styleTab = new PushBtnStyleTabWidget;
 
     QVBoxLayout *vLayout = new QVBoxLayout;
-    vLayout->addLayout(hLayoutPushBtn);
+    vLayout->addLayout(hLayoutShowBtn);
     vLayout->addStretch(1);
     vLayout->addLayout(hLayoutLineEdit);
+    vLayout->addLayout(hLayoutFunBtn);
     vLayout->addWidget(styleTab);
 
     setLayout(vLayout);
 
-    connect(styleTab, &PushBtnStyleTabWidget::styleChanged, pushBtn, &MyPushButton::setQSS);
+    connect(styleTab, &PushBtnStyleTabWidget::styleChanged,this, [&](QString str){
+        pushBtn->setQSS(str);
+        styleSheetStr = str;
+        styleSheetStr.replace(QRegExp("\\{"), "{\n  ");
+        styleSheetStr.replace(QRegExp(";"), ";\n  ");
+        styleSheetStr.replace(QRegExp("\n  \\}"), "\n}\n\n");
+    });
     connect(lineEdit, &QLineEdit::editingFinished, this, [&]() {
         pushBtn->setText(lineEdit->displayText());
+    });
+    connect(clearSSBtn, &QPushButton::clicked, this, [&](){
+        pushBtn->setStyleSheet("");
+    });
+    connect(generateSSBtn, &QPushButton::clicked, this, [this](){
+        emit this->styleSheetGenerated(styleSheetStr);
+        qDebug() << styleSheetStr;
     });
 }
 

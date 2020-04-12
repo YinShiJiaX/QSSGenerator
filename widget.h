@@ -5,6 +5,7 @@
 #include <QVector>
 class QStackedWidget;
 class QListWidget;
+class QTextEdit;
 class QTabWidget;
 class ButtonsTabWidget;
 class InputWidgetsTabWidget;
@@ -27,6 +28,7 @@ private:
     Ui::Widget *ui;
     QListWidget *listWidget;
     QStackedWidget *stackedWidget;
+    QTextEdit *textEdit;
 
     QStringList widgetsTypeNameList = {"Buttons",
                                       "Input Widgets",

@@ -6,6 +6,7 @@
 
 #include <QStackedWidget>
 #include <QListWidget>
+#include <QTextEdit>
 #include <QHBoxLayout>
 #include <QListWidgetItem>
 #include <QSplitter>
@@ -28,12 +29,16 @@ Widget::Widget(QWidget *parent) :
         new QListWidgetItem(widgetsTypeName, listWidget);
     }
 
+    textEdit = new QTextEdit;
+
     QSplitter *splitter = new QSplitter;
 
     splitter->addWidget(listWidget);
     splitter->addWidget(stackedWidget);
+    splitter->addWidget(textEdit);
     splitter->setStretchFactor(0, 1);
     splitter->setStretchFactor(1, 6);
+    splitter->setStretchFactor(2, 4);
 
     QGridLayout *gLayout = new QGridLayout;
     gLayout->addWidget(splitter);
@@ -42,6 +47,9 @@ Widget::Widget(QWidget *parent) :
     resize(800, 450);
 
     connect(listWidget, &QListWidget::currentRowChanged, stackedWidget, &QStackedWidget::setCurrentIndex);
+    connect(buttonsTabWidget, &ButtonsTabWidget::styleSheetGenerated, this, [&](QString str){
+        textEdit->setPlainText(str);
+    });
 
 }
 

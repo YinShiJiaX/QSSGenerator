@@ -51,8 +51,15 @@ public:
 
 private:
     MyPushButton *pushBtn;
+    QPushButton *clearSSBtn;
+    QPushButton *generateSSBtn;
     QLineEdit *lineEdit;
     PushBtnStyleTabWidget *styleTab;
+    QString styleSheetStr;
+
+
+signals:
+    void styleSheetGenerated(QString str);
 
 };
 
